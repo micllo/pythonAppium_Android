@@ -6,6 +6,7 @@ from Common.com_func import log
 from Common.test_func import generate_report, send_DD_for_FXC, send_warning_after_test, is_exist_start_case, \
     stop_case_run_status, start_case_run_status
 from Tools.decorator_tools import async
+import threading
 
 """
  [ 动态修改 suite.py 文件中 TestSuite 类中的 run 方法 ]
@@ -48,6 +49,11 @@ def run_test_custom(self, test, result, debug, index):
     """
     # 启动测试用例：设置用例的'运行状态=running'和'开始时间'
     start_case_run_status(pro_name=test.pro_name, test_method_name=test.test_method)
+
+    # 获取当前线程名称 -> ThreadPoolExecutor-1_0
+    thread_name = threading.currentThread().getName()
+    # 获取当前线程名称索引+1，并赋值给实例对象的属性
+    test.thread_name_index = int(thread_name.split("_")[1]) + 1
 
     if not debug:
         test(result)
@@ -133,17 +139,16 @@ def new_run(self, result, debug=False):
 
 
 @async
-def suite_sync_run_case(pro_name, browser_name, thread_num=2, remote=False):
+def suite_sync_run_case(pro_name, thread_num=1):
     """
     同时执行不同用例（ 通过动态修改'suite.py'文件中'TestSuite'类中的'run'方法，使得每个线程中的结果都可以记录到测试报告中 ）
     :param pro_name: 项目名称
-    :param browser_name: 浏览器名称
     :param thread_num: 线程数
     :param remote: 是否远程执行
        【 备 注 】
       1.suite 实例对象（包含了所有的测试用例实例，即继承了'unittest.TestCase'的子类的实例对象 test_instance ）
-      2.开启浏览器操作（每个用例执行一次）：在每个'测试类'的 setUp 方法中执行 ( 继承 ParaCase 父类 )
-      3.关闭浏览器操作（每个用例执行一次）：在每个'测试类'的 tearDown 方法中执行 ( 继承 ParaCase 父类 )
+      2.启动 Android 设备中的 APP 应用（每个用例执行一次）：在每个'测试类'的 setUp 方法中执行 ( 继承 ParaCase 父类 )
+      3.关闭 Android 设备中的 APP 应用 （每个用例执行一次）：在每个'测试类'的 tearDown 方法中执行 ( 继承 ParaCase 父类 )
 
        【 保 存 截 屏 图 片 ID 的 逻 辑 】
       1.为实例对象'suite'<TestSuite>动态添加一个属性'screen_shot_id_dict' -> screen_shot_id_dict = {}
@@ -152,12 +157,12 @@ def suite_sync_run_case(pro_name, browser_name, thread_num=2, remote=False):
       4.screen_shot_id_dict = { "测试类名.测试方法名":['aaa', 'bbb'], "测试类名.测试方法名":['cccc'] }
     """
     if is_exist_start_case(pro_name):
-        send_DD_for_FXC(title=pro_name, text="#### 可能在执行WEB自动化测试'定时任务'时 遇到 '" + pro_name +
+        send_DD_for_FXC(title=pro_name, text="#### 可能在执行Android自动化测试'定时任务'时 遇到 '" + pro_name +
                                                "' 项目存在<运行中>的用例而未执行测试")
     else:
         # 将'测试类'中的所有'测试方法'添加到 suite 对象中（每个'测试类'实例对象包含一个'测试方法'）
         from TestBase.test_case_unit import ParaCase
-        suite, on_line_test_method_name_list = ParaCase.get_online_case_to_suite(pro_name=pro_name, browser_name=browser_name, remote=remote)
+        suite, on_line_test_method_name_list = ParaCase.get_online_case_to_suite(pro_name=pro_name)
 
         if suite != "mongo error":
             if on_line_test_method_name_list:
@@ -176,18 +181,18 @@ def suite_sync_run_case(pro_name, browser_name, thread_num=2, remote=False):
                 suite.run = MethodType(new_run, suite)
 
                 # 运行测试，并生成测试报告
-                test_result, current_report_file = generate_report(pro_name=pro_name, suite=suite, title='WEB自动化测试报告 - ' + pro_name,
+                test_result, current_report_file = generate_report(pro_name=pro_name, suite=suite, title='Android自动化测试报告 - ' + pro_name,
                                                                    description='详细测试用例结果', tester="自动化测试", verbosity=2)
 
                 # 测试后发送预警
                 # send_warning_after_test(test_result, current_report_file)
             else:
-                send_DD_for_FXC(title=pro_name, text="#### 可能在执行WEB自动化测试'定时任务'时 遇到 '" + pro_name +
+                send_DD_for_FXC(title=pro_name, text="#### 可能在执行Android自动化测试'定时任务'时 遇到 '" + pro_name +
                                                        "' 项目<没有上线>的用例而未执行测试")
 
 
 if __name__ == "__main__":
-    suite_sync_run_case(pro_name="pro_demo_1", browser_name="Chrome", thread_num=3, remote=False)
+    suite_sync_run_case(pro_name="pro_demo_1", browser_name="Chrome", thread_num=1, remote=False)
     # suite_sync_run_case(pro_name="pro_demo_1", browser_name="Firefox", thread_num=3, remote=False)
 
 

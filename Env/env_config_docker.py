@@ -12,14 +12,11 @@ SERVER_IP = "192.168.31.10"  # Demba Ba_5G
 # Nginx 端口
 NGINX_PORT = "1080"
 
-# Mongo 端口
-MONGO_PORT = "27027"
+# Mongo 端口（ docker 多项目需要映射不同的端口 ）
+MONGO_PORT = "27037"
 
 # Nginx中的接口反向代理名称
 NGINX_API_PROXY = "api"
-
-# 是否启用远程浏览器
-REMOTE = True
 
 ############################################# 相 同 的 配 置 #############################################
 
@@ -38,13 +35,12 @@ BASE_REPORT_PATH = "http://" + SERVER_IP + ":" + NGINX_PORT + "/test_report/"
 # 接口地址
 API_ADDR = SERVER_IP + ":" + NGINX_PORT + "/" + NGINX_API_PROXY
 
-# Selenium Grid Console
-# GRID_REMOTE_ADDR = "10.211.55.6:4444"  # win10虚拟机
-GRID_REMOTE_ADDR = SERVER_IP + ":5555"  # docker
+# Appium 服务
+APPIUM_SERVER = SERVER_IP + ":4723/wd/hub"
 
 # mongo 数据库
 MONGODB_ADDR = SERVER_IP + ":" + MONGO_PORT
-MONGODB_DATABASE = "app_auto_test"
+MONGODB_DATABASE = "app_auto_test_appium_android"
 
 # 报错邮箱地址
 MAIL_LIST = ["micllo@126.com"]

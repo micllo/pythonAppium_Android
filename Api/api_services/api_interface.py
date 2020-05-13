@@ -15,8 +15,8 @@ api 服务接口
 """
 
 
-# http://127.0.0.1:8070/api_local/WEB/index
-@flask_app.route("/WEB/index", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/index
+@flask_app.route("/Android/index", methods=["GET"])
 def show_index():
     result_dict = dict()
     result_dict["nginx_api_proxy"] = cfg.NGINX_API_PROXY
@@ -24,8 +24,8 @@ def show_index():
     return render_template('index.html', tasks=result_dict)
 
 
-# http://127.0.0.1:8070/api_local/WEB/get_project_case_list/pro_demo_1
-@flask_app.route("/WEB/get_project_case_list/<pro_name>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/get_project_case_list/pro_demo_1
+@flask_app.route("/Android/get_project_case_list/<pro_name>", methods=["GET"])
 def get_test_case_list(pro_name):
     result_dict = dict()
     result_dict["nginx_api_proxy"] = cfg.NGINX_API_PROXY
@@ -38,8 +38,8 @@ def get_test_case_list(pro_name):
     return render_template('project.html', tasks=result_dict)
 
 
-# http://127.0.0.1:8070/api_local/WEB/get_img/5e61152ff0dd77751382563f
-@flask_app.route("/WEB/get_img/<file_id>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/get_img/5e61152ff0dd77751382563f
+@flask_app.route("/Android/get_img/<file_id>", methods=["GET"])
 def get_screenshot_img(file_id):
     """
     获取截屏图片
@@ -66,8 +66,8 @@ def get_screenshot_img(file_id):
 
 
 
-# http://127.0.0.1:8070/api_local/WEB/set_case_status/pro_demo_1/test_02
-@flask_app.route("/WEB/set_case_status/<pro_name>/<test_method_name>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/set_case_status/pro_demo_1/test_02
+@flask_app.route("/Android/set_case_status/<pro_name>/<test_method_name>", methods=["GET"])
 def set_case_status(pro_name, test_method_name):
     """
     设置某个'测试用例'的'状态'(上下线)
@@ -86,8 +86,8 @@ def set_case_status(pro_name, test_method_name):
     return json.dumps(re_dict, ensure_ascii=False)
 
 
-# http://127.0.0.1:8070/api_local/WEB/set_case_status_all/pro_demo_1/false
-@flask_app.route("/WEB/set_case_status_all/<pro_name>/<case_status>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/set_case_status_all/pro_demo_1/false
+@flask_app.route("/Android/set_case_status_all/<pro_name>/<case_status>", methods=["GET"])
 def set_case_status_all(pro_name, case_status):
     """
     设置整个项目的'测试用例'的'状态'(上下线)
@@ -114,8 +114,8 @@ def set_case_status_all(pro_name, case_status):
     return json.dumps(re_dict, ensure_ascii=False)
 
 
-# http://127.0.0.1:8070/api_local/WEB/stop_run_status/pro_demo_1
-@flask_app.route("/WEB/stop_run_status/<pro_name>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/stop_run_status/pro_demo_1
+@flask_app.route("/Android/stop_run_status/<pro_name>", methods=["GET"])
 def stop_run_status(pro_name):
     """
     强行修改用例运行状态 -> 停止
@@ -134,8 +134,8 @@ def stop_run_status(pro_name):
     return json.dumps(re_dict, ensure_ascii=False)
 
 
-# http://127.0.0.1:8070/api_local/WEB/refresh_run_progress/pro_demo_1
-@flask_app.route("/WEB/refresh_run_progress/<pro_name>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/refresh_run_progress/pro_demo_1
+@flask_app.route("/Android/refresh_run_progress/<pro_name>", methods=["GET"])
 def refresh_run_progress(pro_name):
     """
     刷新执行用例进度
@@ -154,8 +154,8 @@ def refresh_run_progress(pro_name):
     return json.dumps(re_dict, ensure_ascii=False)
 
 
-# http://127.0.0.1:8070/api_local/WEB/refresh_case_run_status/pro_demo_1
-@flask_app.route("/WEB/refresh_case_run_status/<pro_name>", methods=["GET"])
+# http://127.0.0.1:8070/api_local/Android/refresh_case_run_status/pro_demo_1
+@flask_app.route("/Android/refresh_case_run_status/<pro_name>", methods=["GET"])
 def refresh_case_run_status(pro_name):
     """
     刷新用例运行状态

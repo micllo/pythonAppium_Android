@@ -33,8 +33,8 @@
 （1）用例页面 -> http://localhost:6010/api_local/APP/index
 （2）测试报告 -> http://127.0.0.1:6010/test_report_local/<pro_name>/[APP_report]<pro_name>.html
 （3）接口地址 -> http://127.0.0.1:6010/api_local/
-               http://127.0.0.1:6010/api_local/WEB/sync_run_case
-               http://127.0.0.1:6010/api_local/WEB/get_img/5e5cac9188121299450740b3
+               http://127.0.0.1:6010/api_local/Android/sync_run_case
+               http://127.0.0.1:6010/api_local/Android/get_img/5e5cac9188121299450740b3
    （ 备注：uwgsi 启动 6001 端口、nginx 配置 6010 反向代理 6001 ）
 
 5.本地相关服务的启动操作（ gulpfile.js 文件 ）
@@ -210,16 +210,16 @@ adb -s 15a6c95a shell input keyevent 26
 6.访问地址（ Docker 内部 ）：
 （1）测试报告 -> http://127.0.0.1:80/test_report/<pro_name>/[APP_report]<pro_name>.html
 （2）接口地址 -> http://127.0.0.1:80/api/
-               http://127.0.0.1:80/api/WEB/sync_run_case
-               http://127.0.0.1:80/api/WEB/get_img/5e5cac9188121299450740b3
+               http://127.0.0.1:80/api/Android/sync_run_case
+               http://127.0.0.1:80/api/Android/get_img/5e5cac9188121299450740b3
     ( 备注：uwgsi 启动 8081 端口、nginx 配置 80 反向代理 8081 )
 
 7.访问地址（ 外部访问 ）：
-（1）用例页面 -> http://192.168.31.10:1080/api/WEB/index
-（2）测试报告 -> http://192.168.31.10:1080/test_report/<pro_name>/[WEB_report]<pro_name>.html
+（1）用例页面 -> http://192.168.31.10:1080/api/Android/index
+（2）测试报告 -> http://192.168.31.10:1080/test_report/<pro_name>/[Android_report]<pro_name>.html
 （3）接口地址 -> http://192.168.31.10:1080/api/
-               http://192.168.31.10:1080/api/WEB/sync_run_case
-               http://192.168.31.10:1080/api/WEB/get_img/5e5cac9188121299450740b3
+               http://192.168.31.10:1080/api/Android/sync_run_case
+               http://192.168.31.10:1080/api/Android/get_img/5e5cac9188121299450740b3
     ( 备注：docker 配置 1080 映射 80 )
 
 8.关于部署

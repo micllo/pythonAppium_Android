@@ -31,7 +31,7 @@ def generate_report(pro_name, suite, title, description, tester, verbosity=1):
     print("+++++++++++++++++++++++++++++++++++")
 
     now = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime(time.time()))
-    current_report_name = "[WEB_report]" + pro_name + "[" + now + "].html"
+    current_report_name = "[Android_report]" + pro_name + "[" + now + "].html"
     pro_report_path = cfg.REPORTS_DIR + pro_name + "/"
     history_report_path = pro_report_path + "/history/"
     mkdir(history_report_path)
@@ -40,9 +40,9 @@ def generate_report(pro_name, suite, title, description, tester, verbosity=1):
         runner = HTMLTestRunner(stream=fp, title=title, description=description, tester=tester, verbosity=verbosity)
         test_result = runner.run(suite)
 
-    # 将最新报告替换../Reports/{{pro_name}}/下的[WEB_report]{{pro_name}}.html
+    # 将最新报告替换../Reports/{{pro_name}}/下的[Android_report]{{pro_name}}.html
     res = os.system("cp " + current_report_file + " " + pro_report_path + " && "
-                    "mv " + pro_report_path + current_report_name + " " + pro_report_path + "[WEB_report]" + pro_name + ".html")
+                    "mv " + pro_report_path + current_report_name + " " + pro_report_path + "[Android_report]" + pro_name + ".html")
     if res != 0:
         log.error("测试报告替换操作有误！")
 
@@ -85,7 +85,7 @@ def send_mail_after_test(error_type, report_name, report_file):
     :param report_file:
     :return:
     """
-    subject = "WEB自动化测试'" + report_name.split(".")[-2] + "'存在'" + error_type + "'的用例"
+    subject = "Android自动化测试'" + report_name.split(".")[-2] + "'存在'" + error_type + "'的用例"
     content = "在'" + report_name + "'测试报告中 存在'" + error_type + "'的用例\n测试报告地址： " + cfg.CURRENT_REPORT_URL
     send_mail(subject=subject, content=content, to_list=cfg.MAIL_LIST, attach_file=report_file)
 
