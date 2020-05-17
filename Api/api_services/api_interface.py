@@ -9,6 +9,7 @@ from Common.com_func import is_null
 from Common.test_func import is_exist_start_case, is_exist_online_case
 from Tools.mongodb import MongoGridFS
 from Env import env_config as cfg
+from Config.pro_config import pro_exist
 
 """
 api 服务接口
@@ -31,11 +32,49 @@ def get_test_case_list(pro_name):
     result_dict["nginx_api_proxy"] = cfg.NGINX_API_PROXY
     result_dict["pro_name"] = pro_name
     result_dict["test_case_list"] = get_test_case(pro_name)
-    result_dict["current_report_url"] = cfg.BASE_REPORT_PATH + pro_name + "/[WEB_report]" + pro_name + ".html"
+    result_dict["current_report_url"] = cfg.BASE_REPORT_PATH + pro_name + "/[Android_report]" + pro_name + ".html"
     result_dict["history_report_path"] = cfg.BASE_REPORT_PATH + pro_name + "/history/"
     result_dict["is_run"] = is_exist_start_case(pro_name)
     result_dict["progress_info"] = get_progress_info(pro_name)
     return render_template('project.html', tasks=result_dict)
+
+
+@flask_app.route("/Android/sync_run_case/<pro_name>", methods=["POST"])
+def run_case(pro_name):
+    """
+    同时执行不同的用例 (开启线程执行，直接返回接口结果)
+    :param pro_name:
+    :return:
+
+    browser_name: Chrome、Firefox
+    thread_num: 线程数
+    """
+    params = request.json
+    browser_name = params.get("browser_name") if params.get("browser_name") else None
+    thread_num = params.get("thread_num") if params.get("thread_num") else None
+    if not pro_exist(pro_name):
+        msg = PRO_NOT_EXIST
+    elif is_null(browser_name) or is_null(thread_num):
+        msg = PARAMS_NOT_NONE
+    elif browser_name not in ["Chrome", "Firefox"]:
+        msg = BROWSER_NAME_ERROR
+    elif thread_num not in range(1, 6):  # 线程数量范围要控制在1~5之间
+        msg = THREAD_NUM_ERROR
+    else:
+        run_flag = is_exist_start_case(pro_name)
+        if run_flag == "mongo error":
+            msg = MONGO_CONNECT_FAIL
+        else:
+            if run_flag:
+                msg = EXIST_RUNNING_CASE
+            elif is_exist_online_case(pro_name):
+                sync_run_case(pro_name, browser_name, thread_num)
+                msg = CASE_RUNING
+            else:
+                msg = NO_ONLINE_CASE
+    result_dict = {"pro_name": pro_name, "browser_name": browser_name, "thread_num": thread_num}
+    re_dict = interface_template(msg, result_dict)
+    return json.dumps(re_dict, ensure_ascii=False)
 
 
 # http://127.0.0.1:8070/api_local/Android/get_img/5e61152ff0dd77751382563f
@@ -64,6 +103,27 @@ def get_screenshot_img(file_id):
     re_dict = interface_template(msg, {"file_id": file_id, "img_base64": img_base64})
     return json.dumps(re_dict, ensure_ascii=False)
 
+
+# http://127.0.0.1:8070/api_local/WEB/sync_case_list/pro_demo_1
+@flask_app.route("/Android/sync_case_list/<pro_name>", methods=["GET"])
+def sync_case_list(pro_name):
+    """
+    将某项目的所有测试用例同步入mongo库中，默认状态为'下线'
+    :param pro_name:
+    :return:
+    """
+    if is_null(pro_name):
+        msg = PARAMS_NOT_NONE
+    else:
+        insert_result = case_import_mongo(pro_name)
+        if insert_result == "mongo error":
+            msg = MONGO_CONNECT_FAIL
+        elif insert_result == "no such pro":
+            msg = NO_SUCH_PRO
+        else:
+            msg = SYNC_SUCCESS
+    re_dict = interface_template(msg, {"pro_name": pro_name})
+    return json.dumps(re_dict, ensure_ascii=False)
 
 
 # http://127.0.0.1:8070/api_local/Android/set_case_status/pro_demo_1/test_02

@@ -61,11 +61,7 @@ def run_test_custom(self, test, result, debug, index):
         test.debug()
 
     # (self)实例对象'suite'<TestSuite> 为每个执行完毕的(test)'测试用例'实例 保存'截图ID列表'
-    try:
-        self.screen_shot_id_dict[test.screen_shot_id_list_name] = test.screen_shot_id_list
-    except Exception as e:
-        send_DD_for_FXC(title=test.pro_name, text="#### 出现异常 - 可能 远程浏览器监听未开启！！！")
-        log.error(str(e))
+    self.screen_shot_id_dict[test.screen_shot_id_list_name] = test.screen_shot_id_list
 
     if self._cleanup:
         self._removeTestAtIndex(index)
@@ -144,7 +140,6 @@ def suite_sync_run_case(pro_name, thread_num=1):
     同时执行不同用例（ 通过动态修改'suite.py'文件中'TestSuite'类中的'run'方法，使得每个线程中的结果都可以记录到测试报告中 ）
     :param pro_name: 项目名称
     :param thread_num: 线程数
-    :param remote: 是否远程执行
        【 备 注 】
       1.suite 实例对象（包含了所有的测试用例实例，即继承了'unittest.TestCase'的子类的实例对象 test_instance ）
       2.启动 Android 设备中的 APP 应用（每个用例执行一次）：在每个'测试类'的 setUp 方法中执行 ( 继承 ParaCase 父类 )
@@ -192,7 +187,6 @@ def suite_sync_run_case(pro_name, thread_num=1):
 
 
 if __name__ == "__main__":
-    suite_sync_run_case(pro_name="pro_demo_1", browser_name="Chrome", thread_num=1, remote=False)
-    # suite_sync_run_case(pro_name="pro_demo_1", browser_name="Firefox", thread_num=3, remote=False)
+    suite_sync_run_case(pro_name="pro_demo_1", thread_num=1)
 
 

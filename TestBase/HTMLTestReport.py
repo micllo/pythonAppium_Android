@@ -361,7 +361,7 @@ table       { font-size: 100%; }
     GET_SCREENSHOT_TMPL = r"""
     <div>
     <br><HR align=center width=300color=#987cb9 SIZE=1><br>
-    <img id='img_%(screen_shot_id)s' style='width:1200px; height:800px' alt="'%(screen_shot_id)s'图片未显示">
+    <img id='img_%(screen_shot_id)s' style='width:540px; height:960px' alt="'%(screen_shot_id)s'图片未显示">
     </div>
     """
 
@@ -808,7 +808,7 @@ class HTMLTestRunner(Template_mixin):
     def _script_request(self):
         script_request_tmpl = ""
         if self.img_id_list:
-            api_url_base = "http://" + cfg.API_ADDR + "/WEB/get_img/"
+            api_url_base = "http://" + cfg.API_ADDR + "/Android/get_img/"
             img_id_list_str = ".".join(self.img_id_list)
             script_request_tmpl = self.REQUEST_IMG_SCRIPT_TMPL % dict(api_url_base=api_url_base,
                                                                       img_id_list_str=img_id_list_str)

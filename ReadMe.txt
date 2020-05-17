@@ -1,13 +1,62 @@
 
 【 本 地 配 置 项 目 开 发 环 境 】
 
-1.配置本地虚拟环境
+1.配置本地 venv 虚拟环境
 （1）修改：requirements.txt
 （2）执行：sh -x venv_install.sh
 
-2.配置gulpfile依赖
+2.配置 gulpfile 依赖
 （1）修改：gulpfile_install.sh
 （2）执行：sh -x gulpfile_install.sh
+
+3.配置 Nginx -> python_appium_android.conf
+
+upstream api_server_Appium_Android{
+  server 127.0.0.1:6001 weight=1 max_fails=2 fail_timeout=30s;
+  ip_hash;
+}
+
+server {
+  listen 6010;
+  server_name localhost;
+
+  location /test_report_local/ {
+        sendfile off;
+        expires off;
+        gzip on;
+        gzip_min_length 1000;
+        gzip_buffers 4 8k;
+        gzip_types application/json application/javascript application/x-javascript text/css application/xml;
+        add_header Cache-Control no-cache;
+        add_header Cache-Control 'no-store';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        alias /Users/micllo/Documents/works/GitHub/pythonAppium_Android/Reports/;
+       }
+
+  location /api_local/ {
+         proxy_set_header Host $host;
+         proxy_set_header X-Real-IP $remote_addr;
+         proxy_set_header REMOTE-HOST $remote_addr;
+         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504 http_404;
+         proxy_pass http://api_server_Appium_Android/;
+         #proxy_pass http://127.0.0.1:6001/;
+         proxy_redirect default;
+  }
+}
+
+【 备 注 】
+MAC本地安装的 nginx 相关路径
+默认安装路径：/usr/local/Cellar/nginx/1.15.5/
+默认配置文件路径：/usr/local/etc/nginx/
+sudo nginx
+sudo nginx -t
+sudo nginx -s reload
+
 
 
 ########################################################################################################################
@@ -30,8 +79,8 @@
                http://127.0.0.1:6002/API/get_project_case_list/<pro_name>
 
 4.访问地址（ uwsgi 启动 ）：
-（1）用例页面 -> http://localhost:6010/api_local/APP/index
-（2）测试报告 -> http://127.0.0.1:6010/test_report_local/<pro_name>/[APP_report]<pro_name>.html
+（1）用例页面 -> http://localhost:6010/api_local/Android/index
+（2）测试报告 -> http://127.0.0.1:6010/test_report_local/<pro_name>/[Android_report]<pro_name>.html
 （3）接口地址 -> http://127.0.0.1:6010/api_local/
                http://127.0.0.1:6010/api_local/Android/sync_run_case
                http://127.0.0.1:6010/api_local/Android/get_img/5e5cac9188121299450740b3
@@ -41,15 +90,6 @@
 （1）启动服务并调试页面：gulp "html debug"
 （2）停止服务命令：gulp "stop env"
 （3）部署docker服务：gulp "deploy docker"
-
-
-【 备 注 】
-MAC本地安装的 nginx 相关路径
-默认安装路径：/usr/local/Cellar/nginx/1.15.5/
-默认配置文件路径：/usr/local/etc/nginx/
-sudo nginx
-sudo nginx -t
-sudo nginx -s reload
 
 
 【 虚拟环境添加依赖 】
@@ -62,7 +102,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 【 终端启动 appium desktop 服务命令 】
 1.使用 appium desktop 时
-    node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723
+    nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 > /dev/null 2>&1 &
 2.使用 appium server 时
     appium appium -a 127.0.0.1 -p 4723 --session-override &
 

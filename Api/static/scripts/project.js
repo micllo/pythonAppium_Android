@@ -3,7 +3,7 @@
  */
 function update_case_status(pro_name, test_method_name, nginx_api_proxy) {
     // 调用ajax请求(同步)
-    var request_url = "/" + nginx_api_proxy + "/WEB/set_case_status/" + pro_name + "/" + test_method_name
+    var request_url = "/" + nginx_api_proxy + "/Android/set_case_status/" + pro_name + "/" + test_method_name
     var response_info = request_interface_url_v2(url=request_url, method="GET", async=false);
     if(response_info != "请求失败"){
         if(response_info.data.new_case_status == true){
@@ -25,7 +25,7 @@ function update_case_status(pro_name, test_method_name, nginx_api_proxy) {
  */
 function update_case_status_all(pro_name, case_status, nginx_api_proxy) {
     // 调用ajax请求(同步)
-    var request_url = "/" + nginx_api_proxy + "/WEB/set_case_status_all/" + pro_name + "/" + case_status
+    var request_url = "/" + nginx_api_proxy + "/Android/set_case_status_all/" + pro_name + "/" + case_status
     var response_info = request_interface_url_v2(url=request_url, method="GET", async=false);
     if(response_info != "请求失败"){
         $.each(response_info.data.test_method_name_list,function (i, test_method_name) {
@@ -58,7 +58,7 @@ function sync_case_list(pro_name, nginx_api_proxy) {
     }).then(function(isConfirm){
         if (isConfirm) {
             // 调用ajax请求(同步)
-            var request_url = "/" + nginx_api_proxy + "/WEB/sync_case_list/" + pro_name
+            var request_url = "/" + nginx_api_proxy + "/Android/sync_case_list/" + pro_name
             var response_info = request_interface_url_v2(url=request_url, method="GET", async=false);
             if(response_info == "请求失败"){
                 swal({text: response_info, type: "error", confirmButtonText: "知道了"});
@@ -92,7 +92,7 @@ function stop_run_status(pro_name, nginx_api_proxy) {
     }).then(function(isConfirm){
         if (isConfirm) {
             // 调用ajax请求(同步)
-            var request_url = "/" + nginx_api_proxy + "/WEB/stop_run_status/" + pro_name
+            var request_url = "/" + nginx_api_proxy + "/Android/stop_run_status/" + pro_name
             var response_info = request_interface_url_v2(url=request_url, method="GET", async=false);
             if(response_info == "请求失败"){
                 swal({text: response_info, type: "error", confirmButtonText: "知道了"});
@@ -126,7 +126,7 @@ function run_case(pro_name, nginx_api_proxy) {
     }).then(function(isConfirm){
         if (isConfirm) {
             // 调用ajax请求(同步)
-            var request_url = "/" + nginx_api_proxy + "/WEB/sync_run_case/" + pro_name
+            var request_url = "/" + nginx_api_proxy + "/Android/sync_run_case/" + pro_name
             var data_dict = {"browser_name": "Chrome", "thread_num": 2}
             var response_info = request_interface_url_v2(url=request_url, method="POST", data=data_dict, async=false);
             if(response_info == "请求失败"){
@@ -174,7 +174,7 @@ function background_update_process(pro_name, nginx_api_proxy) {
     $("#run_result").html("测试运行中。。。");
     $("#run_result").attr('class', 'label label-warning');
     // 禁灰所有项目的 '上下线'按钮，更新在线用例的'开始时间、运行时间'
-    var request_url = "/" + nginx_api_proxy + "/WEB/refresh_case_run_status/" + pro_name
+    var request_url = "/" + nginx_api_proxy + "/Android/refresh_case_run_status/" + pro_name
     var response_info = request_interface_url_v2(url=request_url, method="GET", async=false);
     var case_run_status_list = response_info.data.case_run_status_list
     $.each(case_run_status_list,function (i, case_info) {
@@ -186,7 +186,7 @@ function background_update_process(pro_name, nginx_api_proxy) {
     // 轮询修改进度信息
     var interval = setInterval(function () {  // 间隔指定的毫秒数不停地执行指定的代码，定时器
         // 更新 用例'运行状态、开始时间、运行时间'
-        var request_url_1 = "/" + nginx_api_proxy + "/WEB/refresh_case_run_status/" + pro_name
+        var request_url_1 = "/" + nginx_api_proxy + "/Android/refresh_case_run_status/" + pro_name
         var response_info_1 = request_interface_url_v2(url=request_url_1, method="GET", async=false);
         var case_run_status_list = response_info_1.data.case_run_status_list
         $.each(case_run_status_list,function (i, case_info) {
@@ -205,7 +205,7 @@ function background_update_process(pro_name, nginx_api_proxy) {
             }
         })
         // 更新 进度条
-        var request_url_2 = "/" + nginx_api_proxy + "/WEB/refresh_run_progress/" + pro_name
+        var request_url_2 = "/" + nginx_api_proxy + "/Android/refresh_run_progress/" + pro_name
         var response_info_2 = request_interface_url_v2(url=request_url_2, method="GET", async=false);
         var progress_info = response_info_2.data.progress_info
         if (progress_info.percent < 100 ) {

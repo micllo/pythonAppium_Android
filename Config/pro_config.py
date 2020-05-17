@@ -1,5 +1,4 @@
-from Project.pro_demo_1.test_case.demo_test import DemoTest
-from Project.pro_demo_1.test_case.train_test import TrainTest
+from Project.pro_demo_1.test_case.demo_test import YybTest
 
 
 def get_test_class_list(pro_name):
@@ -9,7 +8,7 @@ def get_test_class_list(pro_name):
     :return:
     """
     if pro_name == "pro_demo_1":
-        test_class_list = [DemoTest, TrainTest]
+        test_class_list = [YybTest]
     else:
         test_class_list = None
     return test_class_list
@@ -70,19 +69,19 @@ def get_desired_caps(thread_name_index, pro_name):
     desired_caps["platformName"] = "Android"
     desired_caps["appPackage"] = app_info["appPackage"]
     desired_caps["appActivity"] = app_info["appActivity"]
+    desired_caps["automationName"] = "UiAutomator2"
     # 唤醒屏幕
     # desired_caps["unlockType"] = app_info["pattern"]
     # desired_caps["unlockKey"] = app_info["12589"]
 
     if thread_name_index == 1:
-        # 小米 5S
         desired_caps["platformVersion"] = "7.0"
         desired_caps["deviceName"] = "192.168.31.136:5555"
-
+        return desired_caps, "小米5S"
     elif thread_name_index == 2:
-        # 锤子 旧
         desired_caps["platformVersion"] = "7.1.1"
         desired_caps["deviceName"] = "15a6c95a"
-
-    return desired_caps
+        return desired_caps, "锤子旧"
+    else:
+        return desired_caps, "设备未找到"
 

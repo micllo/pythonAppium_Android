@@ -5,7 +5,7 @@ from Config import global_var as gv
 from Tools.mongodb import MongodbUtils
 from Env import env_config as cfg
 from Common.test_func import mongo_exception_send_DD
-from appium import webdriver
+from TestBase.app_action import get_driver
 
 
 class ParaCase(unittest.TestCase):
@@ -22,29 +22,21 @@ class ParaCase(unittest.TestCase):
         self.log = log
         self.pro_name = pro_name
         self.test_method = test_method
+        self.screen_shot_id_list = []  # 截图ID列表
+        self.screen_shot_id_list_name = self.__class__.__name__ + "." + test_method  # 截图ID列表名称
+        self.class_method_path = self.__class__.__name__ + "/" + test_method + "/"  # 获取当前的'类名/方法名/'(提供截屏路径)
         self.thread_name_index = 0  # 记录当前线程名的索引（目的：不同线程使用不同的登录账号）
 
     def setUp(self):
-        # 通过线程名的索引 获取登录账号
         from Config.pro_config import get_login_accout, get_desired_caps
+        # 通过线程名的索引 获取登录账号
         self.user, self.passwd = get_login_accout(self.thread_name_index)
         # 通过线程名的索引和项目名称 获取启动设备信息(指定设备，指定应用)
-        desired_caps = get_desired_caps(self.thread_name_index, self.pro_name)
+        desired_caps, device_name = get_desired_caps(self.thread_name_index, self.pro_name)
         # 启动设备中的应用
-        try:
-            self.driver = webdriver.Remote(cfg.APPIUM_SERVER, desired_caps)
-        except Exception as e:
-            self.log.error(("显示异常：" + str(e)))
-            self.log.error("Android设备未连接！！！")
-            raise Exception("Android设备未连接")
-        self.driver.implicitly_wait(gv.IMPLICITY_WAIT)  # 隐式等待时间
-        self.driver.set_page_load_timeout(gv.PAGE_LOAD_TIME)  # 页面加载超时
-        # 截图ID列表
-        self.screen_shot_id_list = []
-        # 截图ID列表名称
-        self.screen_shot_id_list_name = self.__class__.__name__ + "." + self.test_method
-        # 获取当前的'类名/方法名/'(提供截屏路径)
-        self.class_method_path = self.__class__.__name__ + "/" + self.test_method + "/"
+        self.driver = get_driver(pro_name=self.pro_name, desired_caps=desired_caps, device_name=device_name)
+        # 隐式等待时间
+        self.driver.implicitly_wait(gv.IMPLICITY_WAIT)
 
     def tearDown(self):
         # 关闭应用
