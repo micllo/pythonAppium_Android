@@ -18,6 +18,12 @@ MONGO_PORT = "27037"
 # Nginx中的接口反向代理名称
 NGINX_API_PROXY = "api"
 
+# Appium 服务相关
+APPIUM_SERVER_HOST = "192.168.31.10"
+APPIUM_SERVER_PORT = "22"
+APPIUM_SERVER_USER = "micllo"
+APPIUM_SERVER_PASSWD = "abc123"
+
 ############################################# 相 同 的 配 置 #############################################
 
 # 邮箱配置参数

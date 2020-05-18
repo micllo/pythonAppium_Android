@@ -39,27 +39,15 @@ def get_test_case_list(pro_name):
     return render_template('project.html', tasks=result_dict)
 
 
-@flask_app.route("/Android/sync_run_case/<pro_name>", methods=["POST"])
+@flask_app.route("/Android/sync_run_case/<pro_name>", methods=["GET"])
 def run_case(pro_name):
     """
     同时执行不同的用例 (开启线程执行，直接返回接口结果)
     :param pro_name:
     :return:
-
-    browser_name: Chrome、Firefox
-    thread_num: 线程数
     """
-    params = request.json
-    browser_name = params.get("browser_name") if params.get("browser_name") else None
-    thread_num = params.get("thread_num") if params.get("thread_num") else None
     if not pro_exist(pro_name):
         msg = PRO_NOT_EXIST
-    elif is_null(browser_name) or is_null(thread_num):
-        msg = PARAMS_NOT_NONE
-    elif browser_name not in ["Chrome", "Firefox"]:
-        msg = BROWSER_NAME_ERROR
-    elif thread_num not in range(1, 6):  # 线程数量范围要控制在1~5之间
-        msg = THREAD_NUM_ERROR
     else:
         run_flag = is_exist_start_case(pro_name)
         if run_flag == "mongo error":
@@ -68,11 +56,11 @@ def run_case(pro_name):
             if run_flag:
                 msg = EXIST_RUNNING_CASE
             elif is_exist_online_case(pro_name):
-                sync_run_case(pro_name, browser_name, thread_num)
+                sync_run_case(pro_name)
                 msg = CASE_RUNING
             else:
                 msg = NO_ONLINE_CASE
-    result_dict = {"pro_name": pro_name, "browser_name": browser_name, "thread_num": thread_num}
+    result_dict = {"pro_name": pro_name}
     re_dict = interface_template(msg, result_dict)
     return json.dumps(re_dict, ensure_ascii=False)
 

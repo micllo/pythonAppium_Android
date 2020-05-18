@@ -1,4 +1,21 @@
 
+【 用 例 编 写 注 意 事 项 】
+
+1.在'Project'下创建'项目名称'目录：Project > pro_demo_1
+2.在'项目名称'目录下创建两个目录：page_object、test_case
+3.在'page_object'目录下提供：元素定位、页面操作方法
+4.在'case_test'目录下提供：测试用例
+5.在'Config > pro_config.py'文件中进行项目配置：
+（1）get_test_class_list： 通过'项目名'获取'测试类'列表
+（2）pro_exist：           判断项目名称是否存在
+（3）get_login_accout：    通过'线程名的索引' 获取登录账号
+（4）get_app_info：        通过'项目名称'，获取APP信息（ appPackage、 appActivity ）
+（5）get_desired_caps：    通过'线程名的索引'和'项目名称' 获取启动设备信息(指定设备，指定应用)
+
+
+########################################################################################################################
+
+
 【 本 地 配 置 项 目 开 发 环 境 】
 
 1.配置本地 venv 虚拟环境
@@ -106,6 +123,9 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 2.使用 appium server 时
     appium appium -a 127.0.0.1 -p 4723 --session-override &
 
+3.查看 appium server 进程 PID
+    ps -ef | grep -v "grep" | grep appium
+
 
 ------------------------------------------
 
@@ -114,7 +134,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 1.adb连真机命令：adb connect 192.168.31.136:5555
 
-2.启动appium服务命令：node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723
+2.启动appium服务命令：nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 > /dev/null 2>&1 &
 
  （ 注：第一次需要在真机上进行授权、可能需要删除 ATX.apk 应用 ）
 

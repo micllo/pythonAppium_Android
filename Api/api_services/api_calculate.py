@@ -17,16 +17,14 @@ api 服务底层的业务逻辑
 """
 
 
-def sync_run_case(pro_name, browser_name, thread_num):
+def sync_run_case(pro_name):
     """
     同时执行不同的用例
     :param pro_name
-    :param browser_name: Chrome、Firefox
-    :param thread_num: 线程数
     :return:
     """
     from TestBase.sync_run_case import suite_sync_run_case
-    suite_sync_run_case(pro_name=pro_name, browser_name=browser_name, thread_num=thread_num, remote=cfg.REMOTE)
+    suite_sync_run_case(pro_name=pro_name)
 
 
 def clear_reports_logs(time, pro_name):

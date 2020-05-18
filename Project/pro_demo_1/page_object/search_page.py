@@ -145,10 +145,6 @@ class SearchPage(Base):
 
         # 获取"微信"tab，并点击
         wx_tab = self.get_search_ele(content)
-        self.log.info("wx_tab.text : " + wx_tab.text)
-        self.log.info("wx_tab.location : " + str(wx_tab.location))  # {'x': 144, 'y': 90}
-        self.log.info("text : " + wx_tab.get_attribute("text"))
-        self.log.info("bounds : " + str(wx_tab.get_attribute("bounds")))  # str -> [144,90][780,198]
         wx_tab.click()
 
         # 判断页面内容是否存在，同时截屏、然后断言
@@ -183,10 +179,6 @@ class SearchPage(Base):
 
         # 获取"百度"tab，并点击
         wx_tab = self.get_search_ele("哈哈哈")
-        self.log.info("wx_tab.text : " + wx_tab.text)
-        self.log.info("wx_tab.location : " + str(wx_tab.location))  # {'x': 144, 'y': 90}
-        self.log.info("text : " + wx_tab.get_attribute("text"))
-        self.log.info("bounds : " + str(wx_tab.get_attribute("bounds")))  # str -> [144,90][780,198]
         wx_tab.click()
 
         # 判断页面内容是否存在，同时截屏、然后断言

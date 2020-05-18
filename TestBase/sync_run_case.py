@@ -2,9 +2,9 @@
 from concurrent.futures import ThreadPoolExecutor
 from unittest.suite import _isnotsuite
 from types import MethodType
-from Common.com_func import log
+from Common.com_func import log, is_null
 from Common.test_func import generate_report, send_DD_for_FXC, send_warning_after_test, is_exist_start_case, \
-    stop_case_run_status, start_case_run_status
+    stop_case_run_status, start_case_run_status, get_connected_android_devices_num
 from Tools.decorator_tools import async
 import threading
 
@@ -135,11 +135,14 @@ def new_run(self, result, debug=False):
 
 
 @async
-def suite_sync_run_case(pro_name, thread_num=1):
+def suite_sync_run_case(pro_name, thread_num=None):
     """
     同时执行不同用例（ 通过动态修改'suite.py'文件中'TestSuite'类中的'run'方法，使得每个线程中的结果都可以记录到测试报告中 ）
     :param pro_name: 项目名称
-    :param thread_num: 线程数
+    :param thread_num:
+        （1）若 thread_num == None ：表示当前是'定时任务'，需要通过获取 Android 设备连接数量 来 确定线程数量
+        （2）若 thread_num != None ：表示当前是'页面执行'，页面接口中已经确定好了线程数量，且传过来的线程数一定大于0
+
        【 备 注 】
       1.suite 实例对象（包含了所有的测试用例实例，即继承了'unittest.TestCase'的子类的实例对象 test_instance ）
       2.启动 Android 设备中的 APP 应用（每个用例执行一次）：在每个'测试类'的 setUp 方法中执行 ( 继承 ParaCase 父类 )
@@ -150,43 +153,54 @@ def suite_sync_run_case(pro_name, thread_num=1):
       2.每个测试方法中将所有截屏ID都保存入'screen_shot_id_list' -> screen_shot_id_dict = ['aaa', 'bbb', 'ccc']
       3.实例对象'suite'在重写的'new_run'方法中 将'screen_shot_id_list'添加入'screen_shot_id_dict'
       4.screen_shot_id_dict = { "测试类名.测试方法名":['aaa', 'bbb'], "测试类名.测试方法名":['cccc'] }
+
+      【 获 取 并 发 线 程 数 量 】
+      1.通过ssh连接到appium服务器
+      2.通过adb命令判断当前连接了多少个android设备
+
     """
+
     if is_exist_start_case(pro_name):
-        send_DD_for_FXC(title=pro_name, text="#### 可能在执行Android自动化测试'定时任务'时 遇到 '" + pro_name +
-                                               "' 项目存在<运行中>的用例而未执行测试")
-    else:
-        # 将'测试类'中的所有'测试方法'添加到 suite 对象中（每个'测试类'实例对象包含一个'测试方法'）
-        from TestBase.test_case_unit import ParaCase
-        suite, on_line_test_method_name_list = ParaCase.get_online_case_to_suite(pro_name=pro_name)
+        send_DD_for_FXC(title=pro_name, text="#### '" + pro_name + "' 项目存在<运行中>的用例而未执行测试（定时任务）")
+        return "Done"
 
-        if suite != "mongo error":
-            if on_line_test_method_name_list:
+    if is_null(thread_num):  # 表示当前是'定时任务'，需要通过获取 Android 设备连接数量 来 确定线程数量
+        thread_num = get_connected_android_devices_num(pro_name)
+        if thread_num == 0:
+            send_DD_for_FXC(title=pro_name, text="#### '" + pro_name + "' 项目 未连接任何 Android 设备（定时任务）")
+            return "Done"
 
-                # 为实例对象'suite'<TestSuite>动态添加一个属性'screen_shot_id_dict'（目的：保存截图ID）
-                setattr(suite, "screen_shot_id_dict", {})
+    # 将'测试类'中的所有'测试方法'添加到 suite 对象中（每个'测试类'实例对象包含一个'测试方法'）
+    from TestBase.test_case_unit import ParaCase
+    suite, on_line_test_method_name_list = ParaCase.get_online_case_to_suite(pro_name=pro_name)
 
-                # 为实例对象'suite'<TestSuite>动态添加一个属性'thread_num'（目的：控制多线程数量）
-                setattr(suite, "thread_num", thread_num)
+    if suite != "mongo error":
+        if on_line_test_method_name_list:
 
-                # 为实例对象'suite'<TestSuite>动态添加两个方法'run_test_custom'、'show_result_custom'（ 目的：供多线程中调用 ）
-                suite.run_test_custom = MethodType(run_test_custom, suite)
-                suite.show_result_custom = MethodType(show_result_custom, suite)
+            # 为实例对象'suite'<TestSuite>动态添加一个属性'screen_shot_id_dict'（目的：保存截图ID）
+            setattr(suite, "screen_shot_id_dict", {})
 
-                # 为实例对象'suite'<TestSuite>动态修改实例方法'run'（ 目的：启用多线程来执行case ）
-                suite.run = MethodType(new_run, suite)
+            # 为实例对象'suite'<TestSuite>动态添加一个属性'thread_num'（目的：控制多线程数量）
+            setattr(suite, "thread_num", thread_num)
 
-                # 运行测试，并生成测试报告
-                test_result, current_report_file = generate_report(pro_name=pro_name, suite=suite, title='Android自动化测试报告 - ' + pro_name,
-                                                                   description='详细测试用例结果', tester="自动化测试", verbosity=2)
+            # 为实例对象'suite'<TestSuite>动态添加两个方法'run_test_custom'、'show_result_custom'（ 目的：供多线程中调用 ）
+            suite.run_test_custom = MethodType(run_test_custom, suite)
+            suite.show_result_custom = MethodType(show_result_custom, suite)
 
-                # 测试后发送预警
-                # send_warning_after_test(test_result, current_report_file)
-            else:
-                send_DD_for_FXC(title=pro_name, text="#### 可能在执行Android自动化测试'定时任务'时 遇到 '" + pro_name +
-                                                       "' 项目<没有上线>的用例而未执行测试")
+            # 为实例对象'suite'<TestSuite>动态修改实例方法'run'（ 目的：启用多线程来执行case ）
+            suite.run = MethodType(new_run, suite)
+
+            # 运行测试，并生成测试报告
+            test_result, current_report_file = generate_report(pro_name=pro_name, suite=suite, title='Android自动化测试报告 - ' + pro_name,
+                                                               description='详细测试用例结果', tester="自动化测试", verbosity=2)
+
+            # 测试后发送预警
+            # send_warning_after_test(test_result, current_report_file)
+        else:
+            send_DD_for_FXC(title=pro_name, text="#### '" + pro_name + "' 项目<没有上线>的用例而未执行测试（定时任务）")
 
 
 if __name__ == "__main__":
-    suite_sync_run_case(pro_name="pro_demo_1", thread_num=1)
+    suite_sync_run_case(pro_name="pro_demo_1")
 
 

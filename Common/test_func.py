@@ -6,6 +6,7 @@ from Common.com_func import send_mail, mkdir, send_DD, log
 from Env import env_config as cfg
 from dateutil import parser
 from Tools.date_helper import get_current_iso_date
+from fabric.api import *
 
 
 def generate_report(pro_name, suite, title, description, tester, verbosity=1):
@@ -206,11 +207,45 @@ def stop_case_run_status(pro_name, test_method_name):
             return "mongo error"
 
 
+def get_connected_android_devices_num(pro_name):
+    """
+    获取 已连接的 Android 设备数量
+
+    【 备注 】若 SSH 登录失败，则返回设备数量为 0
+    :return:
+    """
+    # 获取 Android 设备 UDID 列表
+    from Config.pro_config import get_android_device_info
+    android_device_info = get_android_device_info()
+    android_device_udid_list = list(android_device_info.values())
+    device_num = 0
+    try:
+        # 通过 SSH 登录 appium 服务器
+        with settings(host_string="%s@%s:%s" % (cfg.APPIUM_SERVER_USER, cfg.APPIUM_SERVER_HOST, cfg.APPIUM_SERVER_PORT),
+                      password=cfg.APPIUM_SERVER_PASSWD):
+            # 通过 adb 命令 查看 Android 设备 连接情况
+            cmd_res = run("adb devices", warn_only=True)
+            # print(cmd_res)
+            # print(type(cmd_res))
+            # 若 Android 设备 UDID 出现在查询结果中则记录数量
+            for udid in android_device_udid_list:
+                # print(udid)
+                if udid in cmd_res:
+                    device_num += 1
+    except Exception as e:
+        log.info(str(e))
+        send_DD_for_FXC(title=pro_name, text="#### 无法通过SSH登录Appium服务器检查Android设备连接情况")
+    finally:
+        return device_num
+
+
 if __name__ == "__main__":
     pass
     # send_DD_after_test("失败", "报告名称", False)
     # print(get_test_case(pro_name="pro_demo_1"))
     # print(is_exist_online_case(pro_name="pro_demo_1"))
-    stop_case_run_status("pro_demo_1", "test_demo_01")
+    # stop_case_run_status("pro_demo_1", "test_demo_01")
+
+    print(get_connected_android_devices_num("pro_demo_1"))
 
 

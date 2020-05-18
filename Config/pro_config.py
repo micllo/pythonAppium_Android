@@ -57,6 +57,17 @@ def get_app_info(pro_name):
     return app_info
 
 
+def get_android_device_info():
+    """
+    获取 Android 设备信息
+    :return:
+    """
+    android_device_info = dict()
+    android_device_info["小米5S"] = "192.168.31.136:5555"
+    android_device_info["锤子PRO1"] = "15a6c95a"
+    return android_device_info
+
+
 def get_desired_caps(thread_name_index, pro_name):
     """
     通过线程名的索引和项目名称 获取启动设备信息(指定设备，指定应用)
@@ -65,23 +76,32 @@ def get_desired_caps(thread_name_index, pro_name):
     :return:
     """
     app_info = get_app_info(pro_name)
+    android_device_info = get_android_device_info()
     desired_caps = dict()
     desired_caps["platformName"] = "Android"
     desired_caps["appPackage"] = app_info["appPackage"]
     desired_caps["appActivity"] = app_info["appActivity"]
+    # 使用哪个自动化引擎
     desired_caps["automationName"] = "UiAutomator2"
+    # Appium 等待接收从客户端发送的新命令的超时时长，超时后Appium会终止会话
+    desired_caps["newCommandTimeout"] = 300
+    # Android 等待设备就绪的超时时长，以秒为单位
+    desired_caps["deviceReadyTimeout"] = 60
+    # Android 在启动后等待设备就绪的超时时长，以秒为单位
+    desired_caps["androidDeviceReadyTimeout"] = 60
+
     # 唤醒屏幕
-    # desired_caps["unlockType"] = app_info["pattern"]
-    # desired_caps["unlockKey"] = app_info["12589"]
+    desired_caps["unlockType"] = "pattern"
+    desired_caps["unlockKey"] = "12589"
 
     if thread_name_index == 1:
         desired_caps["platformVersion"] = "7.0"
-        desired_caps["deviceName"] = "192.168.31.136:5555"
+        desired_caps["deviceName"] = android_device_info["小米5S"]
         return desired_caps, "小米5S"
     elif thread_name_index == 2:
         desired_caps["platformVersion"] = "7.1.1"
-        desired_caps["deviceName"] = "15a6c95a"
-        return desired_caps, "锤子旧"
+        desired_caps["deviceName"] = android_device_info["锤子PRO1"]
+        return desired_caps, "锤子PRO1"
     else:
         return desired_caps, "设备未找到"
 

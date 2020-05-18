@@ -154,7 +154,7 @@ class MongoGridFS(object):
             grid_outs = self.fs.find(query_dict)
             file_id_list = []
             for grid_out in grid_outs:
-                # print(grid_out.__dict__)
+                log.info(grid_out.__dict__)
                 file_id_list.append(str(grid_out._file.get("_id")))
             for file_id in file_id_list:
                 self.fs.delete(file_id=ObjectId(file_id))
