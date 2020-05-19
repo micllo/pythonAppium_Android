@@ -1,12 +1,51 @@
 # -*- coding:utf-8 -*-
 from Common.com_func import project_path, log, mkdir
 from Env import env_config as cfg
-from selenium.common.exceptions import TimeoutException
-from Config import global_var as gv
 import time
 from Tools.mongodb import MongoGridFS
 from appium import webdriver
 from Common.test_func import send_DD_for_FXC
+
+
+def get_desired_caps(pro_name, current_thread_name_index, connected_android_device_list):
+    """
+    获取 Appium 服务启动应用所需的能力参数 (指定设备，指定应用)
+    :param pro_name
+    :param current_thread_name_index: 当前线程名字的索引
+    :param connected_android_device_list: 已连接设备信息列表
+    [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555" } } ,
+      { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "15a6c95a" } } ]
+    :return:
+
+    【 备 注 】通过'当前线程名索引' 获取已连接设备列表中对应的设备信息
+    """
+    from Config.pro_config import get_app_info
+    app_info = get_app_info(pro_name)
+    desired_caps = dict()
+    desired_caps["platformName"] = "Android"
+    desired_caps["appPackage"] = app_info["appPackage"]
+    desired_caps["appActivity"] = app_info["appActivity"]
+    # 使用哪个自动化引擎
+    desired_caps["automationName"] = "UiAutomator2"
+    # Appium 等待接收从客户端发送的新命令的超时时长，超时后Appium会终止会话
+    desired_caps["newCommandTimeout"] = 30
+    # Android 等待设备就绪的超时时长，以秒为单位
+    desired_caps["deviceReadyTimeout"] = 30
+    # Android 在启动后等待设备就绪的超时时长，以秒为单位
+    desired_caps["androidDeviceReadyTimeout"] = 30
+
+    # 唤醒屏幕（效果不理想）
+    desired_caps["unlockType"] = "pattern"
+    desired_caps["unlockKey"] = "12589"
+
+    device_name = "设备未找到"
+    for connected_android_devices_dict in connected_android_device_list:
+        if current_thread_name_index == connected_android_devices_dict["thread_index"]:
+            desired_caps["platformVersion"] = connected_android_devices_dict["platform_version"]
+            desired_caps["deviceName"] = connected_android_devices_dict["device_udid"]
+            device_name = connected_android_devices_dict["device_name"]
+            break
+    return desired_caps, device_name
 
 
 def get_driver(pro_name, desired_caps, device_name):

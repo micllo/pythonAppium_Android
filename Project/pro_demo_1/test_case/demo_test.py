@@ -9,7 +9,7 @@ class YybTest(ParaCase):
     """ 应 用 宝 用 例 集"""
 
     def test_search_hszz(self):
-        """ 测试搜索'皇室战争'(成功)  """
+        """ 测试搜索'皇室战争'(通过)  """
         log.info("user(test_search_hszz): " + self.user)
         log.info("passwd(test_search_hszz): " + self.passwd)
 
