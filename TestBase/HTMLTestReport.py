@@ -613,11 +613,12 @@ class HTMLTestRunner(Template_mixin):
 
     def generateReport(self, suite, result):
         screen_shot_id_dict = suite.screen_shot_id_dict  # 获取截图ID字典
+        android_device_name_dict = suite.android_device_name_dict  # 获取使用Android设备名称字典
         report_attrs = self.getReportAttributes(result)
         generator = 'HTMLTestRunner %s' % __version__
         stylesheet = self._generate_stylesheet()
         heading = self._generate_heading(report_attrs)
-        report = self._generate_report(result, screen_shot_id_dict)
+        report = self._generate_report(result, screen_shot_id_dict, android_device_name_dict)
         ending = self._generate_ending()
         script_request = self._script_request()
         output = self.HTML_TMPL % dict(
@@ -652,10 +653,11 @@ class HTMLTestRunner(Template_mixin):
         return heading
 
     # 生成报告
-    def _generate_report(self, result, screen_shot_id_dict):
+    def _generate_report(self, result, screen_shot_id_dict, android_device_name_dict):
         """
         :param result:
         :param screen_shot_id_dict: 截图ID字典 -> { "测试类名.测试方法名":['aaa', 'bbb'], "测试类名.测试方法名":['ccc'] }
+        :param android_device_name_dict: 使用的Android设备名称字典 -> { "测试类名.测试方法名":"小米5S", "测试类名.测试方法名":"坚果Pro" }
         :return:
         【 显 示 截 图 的 逻 辑 】
          1.根据'测试类名'取出该类下的所有'测试方法'对应的'截图ID列表'的字典 -> { "测试方法名":['aaa', 'bbb'], "测试方法名":['ccc'] }
@@ -698,15 +700,21 @@ class HTMLTestRunner(Template_mixin):
             )
             rows.append(row)
 
-            # 根据'测试类名'取出该类下的所有'测试方法'对应的'截图ID列表'的字典
+            # 根据'测试类名'取出该类下的所有'测试方法'对应的'截图ID列表'的字典 -> { "测试方法名":['aaa', 'bbb'], "测试方法名":['ccc'] }
             screen_shot_id_dict_with_test_method = {}
             for key, value in screen_shot_id_dict.items():
                 if key.split(".")[0] == cls.__name__:
                     screen_shot_id_dict_with_test_method[key.split(".")[1]] = value
 
+            # 根据'测试类名'取出该类下的所有'测试方法'对应的'使用的Android设备名称'的字典 -> { "测试方法名":"小米5S", "测试方法名":"坚果Pro" }
+            android_device_name_dict_with_test_method = {}
+            for key, value in android_device_name_dict.items():
+                if key.split(".")[0] == cls.__name__:
+                    android_device_name_dict_with_test_method[key.split(".")[1]] = value
+
             # 为每个'测试用例类'循环添加'测试用例执行结果'模板样式 保存在'rows'列表中
             for tid, (n, t, o, e) in enumerate(cls_results):
-                self._generate_report_test(rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method)
+                self._generate_report_test(rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method, android_device_name_dict_with_test_method)
 
         report = self.REPORT_TMPL % dict(
             test_list=''.join(rows),
@@ -718,7 +726,7 @@ class HTMLTestRunner(Template_mixin):
         )
         return report
 
-    def _generate_report_test(self, rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method):
+    def _generate_report_test(self, rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method, android_device_name_dict_with_test_method):
         """
         :param rows:
         :param cid:
@@ -741,6 +749,9 @@ class HTMLTestRunner(Template_mixin):
         # 获取该'测试方法'的'截图ID列表'
         screen_shot_list = screen_shot_id_dict_with_test_method[name]
 
+        # 获取该'测试方法'的'使用的Android设备名称'
+        android_device_name = android_device_name_dict_with_test_method[name]
+
         # 获取'截图按钮'样式
         if screen_shot_list:
             screen_shot_btn_tmpl = self.SCREENSHOT_BTN_TMPL % dict(tid=tid)
@@ -756,9 +767,10 @@ class HTMLTestRunner(Template_mixin):
                 get_screenshot_tmpl_list += self.GET_SCREENSHOT_TMPL % dict(screen_shot_id=screen_shot_id)
             show_img_div_tmpl = self.SHOW_SCREENSHOT_DIV_TMPL % dict(tid=tid, get_screenshot_tmpl_list=get_screenshot_tmpl_list)
 
-        # 获取测试方法中的 __doc__
+        # 获取测试方法中的 __doc__, 并加上（使用的Android设备名称）
         doc = t.shortDescription() or ""
         desc = doc and ('%s: %s' % (name, doc)) or name
+        desc = desc + " <" + android_device_name + ">"
 
         # 若n==0表示通过，则使用'通过'的样式，否则使用'失败'或'错误'的样式
         tmpl = n == 0 and self.REPORT_TEST_FOR_PASS_TMPL or self.REPORT_TEST_FOR_EF_TMPL
@@ -816,7 +828,7 @@ class HTMLTestRunner(Template_mixin):
 
 
 if __name__ == "__main__":
-    api_url = "http://" + cfg.API_ADDR + "/WEB/get_img/" + "5e609cdacd380a0cef68056f"
+    api_url = "http://" + cfg.API_ADDR + "/Android/get_img/" + "5e609cdacd380a0cef68056f"
     res_dict = requests.get(api_url).json()
     img_base64 = res_dict.get("result").get("img_base64")
     print(img_base64[2:-1])

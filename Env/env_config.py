@@ -17,11 +17,11 @@ MONGO_PORT = "27017"
 # Nginx中的接口反向代理名称
 NGINX_API_PROXY = "api_local"
 
-# Appium 服务相关
-APPIUM_SERVER_HOST = "127.0.0.1"
-APPIUM_SERVER_PORT = "22"
-APPIUM_SERVER_USER = "micllo"
-APPIUM_SERVER_PASSWD = "abc123"
+# SDK 服务相关
+SDK_SERVER_HOST = "127.0.0.1"
+SDK_SERVER_PORT = "22"
+SDK_SERVER_USER = "micllo"
+SDK_SERVER_PASSWD = "abc123"
 
 ############################################# 相 同 的 配 置 #############################################
 
@@ -41,7 +41,8 @@ BASE_REPORT_PATH = "http://" + SERVER_IP + ":" + NGINX_PORT + "/test_report_loca
 API_ADDR = SERVER_IP + ":" + NGINX_PORT + "/" + NGINX_API_PROXY
 
 # Appium 服务
-APPIUM_SERVER = SERVER_IP + ":4723/wd/hub"
+APPIUM_SERVER_4723 = SERVER_IP + ":4723/wd/hub"
+APPIUM_SERVER_4724 = SERVER_IP + ":4724/wd/hub"
 
 # mongo 数据库
 MONGODB_ADDR = SERVER_IP + ":" + MONGO_PORT

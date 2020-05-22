@@ -46,48 +46,49 @@ class SearchPage(Base):
         【 页 面 功 能 】
     """
 
-    def common_step(self, case_instance):
+    def xiao_mi_5s_step(self):
         """
-        公共步骤
-        :param case_instance:
+        小米5S 需要执行的步骤
         :return:
         """
+
         # 触摸点击'我知道了'按钮
-        self.screenshot(image_name="iknow_btn.png", case_instance=case_instance)
+        self.screenshot(image_name="iknow_btn.png")
         self.touch_iknow_btn()
         time.sleep(2)
 
         # 点击相关'允许'按钮
-        self.screenshot(image_name="allowed_btn1.png", case_instance=case_instance)
+        self.screenshot(image_name="allowed_btn1.png")
         self.allowed_btn().click()
         time.sleep(2)
-        self.screenshot(image_name="allowed_btn2.png", case_instance=case_instance)
+        self.screenshot(image_name="allowed_btn2.png")
         self.allowed_btn().click()
         time.sleep(5)
 
         # 点击相关'X'按钮
-        self.screenshot(image_name="close_btn.png", case_instance=case_instance)
+        self.screenshot(image_name="close_btn.png")
         self.close_btn().click()
         time.sleep(2)
 
-        # 获取搜索文本框1，并点击
-        self.screenshot(image_name="search_field.png", case_instance=case_instance)
-        self.search_field_1().click()
-        time.sleep(2)
-
-    def search_hszz(self, content, case_instance):
+    def search_hszz(self, content):
         """
         搜索功能(皇室战争)
         :return:
         """
-        # 公共步骤
-        self.common_step(case_instance)
+
+        if self.device_name == "小米5S":
+            self.xiao_mi_5s_step()
+
+        # 获取搜索文本框1，并点击
+        self.screenshot(image_name="hszz_1_search_field.png")
+        self.search_field_1().click()
+        time.sleep(2)
 
         # 获取搜索文本框2，并输入内容
         search_field = self.search_field_2()
         search_field.send_keys(content)
         time.sleep(2)
-        self.screenshot(image_name="hszz_1_search_field.png", case_instance=case_instance)
+        self.screenshot(image_name="hszz_2_search_field.png")
 
         # 获取搜索按钮，并点击
         self.search_btn().click()
@@ -110,26 +111,31 @@ class SearchPage(Base):
         hszz_tab.click()
 
         # 判断页面内容是否存在，同时截屏、然后断言
-        self.assert_content_and_screenshot(image_name="hszz_2_target_page.png", case_instance=case_instance,
-                                           content=content, time_out=20, error_msg="页面跳转失败！- 找不到'"+content+"'内容")
+        self.assert_content_and_screenshot(image_name="hszz_2_target_page.png", content=content, error_msg="页面跳转失败！- 找不到'"+content+"'内容")
 
         # 回退上一页
         # self.back()
         # time.sleep(5)
 
-    def search_wx(self, content, case_instance):
+    def search_wx(self, content):
         """
         搜索功能(微信)
         :return:
         """
-        # 公共步骤
-        self.common_step(case_instance)
+
+        if self.device_name == "小米5S":
+            self.xiao_mi_5s_step()
+
+        # 获取搜索文本框1，并点击
+        self.screenshot(image_name="wx_1_search_field.png")
+        self.search_field_1().click()
+        time.sleep(2)
 
         # 获取搜索文本框2，并输入内容
         search_field = self.search_field_2()
         search_field.send_keys(content)
         time.sleep(2)
-        self.screenshot(image_name="wx_1_search_field.png", case_instance=case_instance)
+        self.screenshot(image_name="wx_2_search_field.png")
 
         # 获取搜索按钮，并点击
         self.search_btn().click()
@@ -148,22 +154,27 @@ class SearchPage(Base):
         wx_tab.click()
 
         # 判断页面内容是否存在，同时截屏、然后断言
-        self.assert_content_and_screenshot(image_name="wx_2_target_page.png", case_instance=case_instance,
-                                           content="哈哈哈", time_out=20, error_msg="页面跳转失败！- 找不到'哈哈哈'内容")
+        self.assert_content_and_screenshot(image_name="wx_2_target_page.png", content="哈哈哈", error_msg="页面跳转失败！- 找不到'哈哈哈'内容")
 
-    def search_bd(self, content, case_instance):
+    def search_bd(self, content):
         """
         搜索功能(百度)
         :return:
         """
-        # 公共步骤
-        self.common_step(case_instance)
+
+        if self.device_name == "小米5S":
+            self.xiao_mi_5s_step()
+
+        # 获取搜索文本框1，并点击
+        self.screenshot(image_name="bd_1_search_field.png")
+        self.search_field_1().click()
+        time.sleep(2)
 
         # 获取搜索文本框2，并输入内容
         search_field = self.search_field_2()
         search_field.send_keys(content)
         time.sleep(2)
-        self.screenshot(image_name="bd_1_search_field.png", case_instance=case_instance)
+        self.screenshot(image_name="bd_2_search_field.png")
 
         # 获取搜索按钮，并点击
         self.search_btn().click()
@@ -182,6 +193,5 @@ class SearchPage(Base):
         wx_tab.click()
 
         # 判断页面内容是否存在，同时截屏、然后断言
-        self.assert_content_and_screenshot(image_name="bd_2_target_page.png", case_instance=case_instance,
-                                           content=content, time_out=20, error_msg="页面跳转失败！- 找不到'"+content+"'内容")
+        self.assert_content_and_screenshot(image_name="bd_2_target_page.png", content=content, error_msg="页面跳转失败！- 找不到'" + content + "'内容")
 

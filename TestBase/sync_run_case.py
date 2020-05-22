@@ -61,7 +61,10 @@ def run_test_custom(self, test, result, debug, index):
         test.debug()
 
     # (self)实例对象'suite'<TestSuite> 为每个执行完毕的(test)'测试用例'实例 保存'截图ID列表'
-    self.screen_shot_id_dict[test.screen_shot_id_list_name] = test.screen_shot_id_list
+    self.screen_shot_id_dict[test.class_method_name] = test.screen_shot_id_list
+
+    # (self)实例对象'suite'<TestSuite> 为每个执行完毕的(test)'测试用例'实例 保存'使用的Android设备名称'
+    self.android_device_name_dict[test.class_method_name] = test.device_name
 
     if self._cleanup:
         self._removeTestAtIndex(index)
@@ -139,9 +142,6 @@ def suite_sync_run_case(pro_name):
     """
     同时执行不同用例（ 通过动态修改'suite.py'文件中'TestSuite'类中的'run'方法，使得每个线程中的结果都可以记录到测试报告中 ）
     :param pro_name: 项目名称
-    :param thread_num:
-        （1）若 thread_num == None ：表示当前是'定时任务'，需要通过获取 Android 设备连接数量 来 确定线程数量
-        （2）若 thread_num != None ：表示当前是'页面执行'，页面接口中已经确定好了线程数量，且传过来的线程数一定大于0
 
         【 备 注 】
         1.suite 实例对象（包含了所有的测试用例实例，即继承了'unittest.TestCase'的子类的实例对象 test_instance ）
@@ -155,12 +155,14 @@ def suite_sync_run_case(pro_name):
         4.screen_shot_id_dict = { "测试类名.测试方法名":['aaa', 'bbb'], "测试类名.测试方法名":['cccc'] }
 
         【 并 发 线 程 数 逻 辑 】
-        1.通过ssh连接到appium服务器
+        1.通过ssh连接到 SDK 服务器
         2.通过adb命令判断指定设备的连接情况：返回 已连接设备信息列表
-            [ { "thread_index": 1, "device_name": "小米5S", "device_udid": "192.168.31.136:5555" } } ,
-              { "thread_index": 2, "device_name": "坚果Pro", "device_udid": "15a6c95a" } } ]
+         [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ,
+           { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "15a6c95a", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ]
         3.返回的列表数量 作为 线程数量
-        4.已连接设备的UDID列表 作为 不同线程中指定启动的设备
+
+        【 每 个 用 例 使 用 Android 设 备 逻 辑 】
+        通过'当前线程名的索引'和'已连接设备列表' 获取 Appium 服务启动应用所需的能力参数 (指定设备，指定应用)
 
     """
     # （定时任务）需要判断 是否存在运行中的用例
@@ -189,6 +191,9 @@ def suite_sync_run_case(pro_name):
         else:
             # 为实例对象'suite'<TestSuite>动态添加一个属性'screen_shot_id_dict'（目的：保存截图ID）
             setattr(suite, "screen_shot_id_dict", {})
+
+            # 为实例对象'suite'<TestSuite>动态添加一个属性'android_device_name_dict'（目的：保存使用的Android设备名称）
+            setattr(suite, "android_device_name_dict", {})
 
             # 为实例对象'suite'<TestSuite>动态添加一个属性'thread_num'（目的：控制多线程数量）
             setattr(suite, "thread_num", thread_num)

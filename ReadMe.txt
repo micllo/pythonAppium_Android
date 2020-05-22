@@ -10,7 +10,7 @@
 （2）pro_exist：           判断项目名称是否存在
 （3）get_login_accout：    通过'线程名的索引' 获取登录账号
 （4）get_app_info：        通过'项目名称'，获取APP信息（ appPackage、 appActivity ）
-（5）get_desired_caps：    通过'线程名的索引'和'项目名称' 获取启动设备信息(指定设备，指定应用)
+（5）config_android_device_info_list：    配置 Android 设备信息列表
 
 
 【 未 解 决 的 问 题 】
