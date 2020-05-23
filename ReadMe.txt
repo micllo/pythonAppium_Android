@@ -18,6 +18,12 @@
   可能的解决方案：（1）在'desired_caps'中找到启动设备时点亮屏幕的方法、（2）将真机设置保持常亮
 
 
+【 关于 本地 gulp 部 署 后 的 注 意 事 项 】
+1.手动连接Docker中的设备 < 该命令无法使用gulp 必须手动执行 >
+2.手动确认：Appium服务是否正常启动、Android设备是否正确连接
+（ 相关命令在 gulpfile.js 文件最后 ）
+
+
 ########################################################################################################################
 
 
@@ -123,10 +129,13 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 
 【 终端启动 appium desktop 服务命令 】
-1.使用 appium desktop 时
-    nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 > /dev/null 2>&1 &
-2.使用 appium server 时
+1.使用 appium server 时
     appium appium -a 127.0.0.1 -p 4723 --session-override &
+
+2.使用 appium desktop 时
+    nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 --bootstrap-port 4713 > /dev/null 2>&1 &
+    --port ：appium监听端口
+    --bootstrap-port ：连接Android设备的端口
 
 3.查看 appium server 进程 PID
     ps -ef | grep -v "grep" | grep appium
@@ -137,11 +146,14 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 【 本 地 配 置 Appium Android 环 境 】
 
-1.adb连真机命令：adb connect 192.168.31.136:5555
-
-2.启动appium服务命令：nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 > /dev/null 2>&1 &
-
+【 Mac 】
+1.adb连真机命令：adb connect 192.168.31.253:4444 < 坚果Pro >
+2.启动appium服务命令：nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 --bootstrap-port 4713 > /dev/null 2>&1 &
  （ 注：第一次需要在真机上进行授权、可能需要删除 ATX.apk 应用 ）
+
+【 Docker 】
+1.adb连真机命令：docker exec -it appium_andriod adb connect 192.168.31.136:5555 < 小米5S >
+2.启动appium容器
 
 
 ------------------------------------------

@@ -4,9 +4,10 @@ from unittest.suite import _isnotsuite
 from types import MethodType
 from Common.com_func import log, is_null
 from Common.test_func import generate_report, send_DD_for_FXC, send_warning_after_test, is_exist_start_case, \
-    stop_case_run_status, start_case_run_status, get_connected_android_devices_info
+    stop_case_run_status, start_case_run_status
 from Tools.decorator_tools import async
 import threading
+from Config.pro_config import config_android_device_with_appium_server_list
 
 """
  [ 动态修改 suite.py 文件中 TestSuite 类中的 run 方法 ]
@@ -155,11 +156,11 @@ def suite_sync_run_case(pro_name):
         4.screen_shot_id_dict = { "测试类名.测试方法名":['aaa', 'bbb'], "测试类名.测试方法名":['cccc'] }
 
         【 并 发 线 程 数 逻 辑 】
-        1.通过ssh连接到 SDK 服务器
-        2.通过adb命令判断指定设备的连接情况：返回 已连接设备信息列表
-         [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ,
-           { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "15a6c95a", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ]
-        3.返回的列表数量 作为 线程数量
+        前提：需要先手动检查： Appium服务是否正常启动、Android设备是否正确连接
+        1.获取已连接设备信息列表
+         [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ,
+           { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "192.168.31.253:4444", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ]
+        2.返回的列表数量 作为 线程数量
 
         【 每 个 用 例 使 用 Android 设 备 逻 辑 】
         通过'当前线程名的索引'和'已连接设备列表' 获取 Appium 服务启动应用所需的能力参数 (指定设备，指定应用)
@@ -171,7 +172,7 @@ def suite_sync_run_case(pro_name):
         return "Done"
 
     # 获取 已连接的 Android 设备信息列表
-    connected_android_device_list = get_connected_android_devices_info(pro_name)
+    connected_android_device_list = config_android_device_with_appium_server_list()
     # 列表数量 作为 线程数量
     thread_num = len(connected_android_device_list)
     log.info("\n线程数量 ： " + str(thread_num))

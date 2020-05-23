@@ -14,8 +14,8 @@ def get_android_driver(pro_name, current_thread_name_index, connected_android_de
     :param pro_name
     :param current_thread_name_index: 当前线程名字的索引
     :param connected_android_device_list: 已连接设备信息列表
-    [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ,
-      { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "15a6c95a", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ]
+    [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ,
+      { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "192.168.31.253:4444", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ]
     :return:
 
     【 步 骤 】

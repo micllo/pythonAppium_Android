@@ -61,27 +61,31 @@ def get_app_info(pro_name):
 def config_android_device_with_appium_server_list():
     """
     配置 Android 设备信息 以及 对应的 Appium 服务
-    [ { "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ,
-      { "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "15a6c95a", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ]
+    [ { "thread_index": 1, "device_name": "小米5S", "platform_version": "7.0", "device_udid": "192.168.31.136:5555", "appium_server": "http://127.0.0.1:4724/wd/hub" } } ,
+      { "thread_index": 2, "device_name": "坚果Pro", "platform_version": "7.1.1", "device_udid": "192.168.31.253:4444", "appium_server": "http://127.0.0.1:4723/wd/hub" } } ]
 
       【 备 注 】
-      一个Appium服务只能启动一个Android设备，若要使用多线程，则必须要将Android设备与Appium服务绑定起来
+      1.一个Appium服务只能启动一个Android设备，若要使用多线程，则必须要将Android设备与Appium服务绑定起来
+      2.<小米5S>已刷机，可以通过无线连接设备，所以使用docker中的appium服务
+      3.<坚果Pro>未刷机，需要连接一次USB，所以使用mac中的appium服务
     :return:
     """
     android_device_info_list = []
 
     xiao_mi_5s = dict()
+    xiao_mi_5s["thread_index"] = 1
     xiao_mi_5s["device_name"] = "小米5S"
     xiao_mi_5s["platform_version"] = "7.0"
     xiao_mi_5s["device_udid"] = "192.168.31.136:5555"
-    xiao_mi_5s["appium_server"] = cfg.APPIUM_SERVER_4723
+    xiao_mi_5s["appium_server"] = cfg.APPIUM_SERVER_DOCKER_4724
     android_device_info_list.append(xiao_mi_5s)
 
     smartisan_pro = dict()
+    smartisan_pro["thread_index"] = 2
     smartisan_pro["device_name"] = "坚果Pro"
     smartisan_pro["platform_version"] = "7.1.1"
-    smartisan_pro["device_udid"] = "15a6c95a"
-    smartisan_pro["appium_server"] = cfg.APPIUM_SERVER_4724
+    smartisan_pro["device_udid"] = "192.168.31.253:4444"
+    smartisan_pro["appium_server"] = cfg.APPIUM_SERVER_MAC_4723
     android_device_info_list.append(smartisan_pro)
 
     return android_device_info_list
