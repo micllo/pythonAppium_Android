@@ -10,7 +10,12 @@
 （2）pro_exist：           判断项目名称是否存在
 （3）get_login_accout：    通过'线程名的索引' 获取登录账号
 （4）get_app_info：        通过'项目名称'，获取APP信息（ appPackage、 appActivity ）
-（5）config_android_device_info_list：    配置 Android 设备信息列表
+（5）config_android_device_with_appium_server_list：    配置 Android 设备信息 以及 对应的 Appium 服务
+
+    < 备 注 >
+      1.一个Appium服务只能启动一个Android设备，若要使用多线程，则必须要将Android设备与Appium服务绑定起来
+      2.<小米5S>已刷机，可以通过无线连接设备，所以使用docker中的appium服务
+      3.<坚果Pro>未刷机，需要连接一次USB，所以使用mac中的appium服务
 
 
 【 未 解 决 的 问 题 】
@@ -18,10 +23,14 @@
   可能的解决方案：（1）在'desired_caps'中找到启动设备时点亮屏幕的方法、（2）将真机设置保持常亮
 
 
-【 关于 本地 gulp 部 署 后 的 注 意 事 项 】
-1.手动连接Docker中的设备 < 该命令无法使用gulp 必须手动执行 >
-2.手动确认：Appium服务是否正常启动、Android设备是否正确连接
-（ 相关命令在 gulpfile.js 文件最后 ）
+【 关于 本地 gulp 部 署 前 后 的 注 意 事 项 】
+1.部署前：
+（1）启动 Docker 的 appium_server 服务
+（2）连接 Docker 中的设备 < 注意：第一次连接时，需要在手机上进行确认授权 >
+2.部署后：
+（1）手动连接 Docker 中的设备 < 该命令无法使用gulp 必须手动执行 >
+（2）手动确认：Appium服务是否正常启动、Android设备是否正确连接
+    （ 相关命令在 gulpfile.js 文件最后 ）
 
 
 ########################################################################################################################
@@ -90,6 +99,25 @@ sudo nginx -s reload
 ########################################################################################################################
 
 
+【 配 置 Appium Android 环 境 】（ Mac 和 Docker 一样 ）
+
+由于：多线程并发启动不同设备进行测试时，每个用例中使用的appium服务和androidSDK服务都必须要是独立的
+所以：启动两个 Appium 服务
+
+【 Mac Appium Server 】
+1.adb连真机命令：adb connect 192.168.31.253:4444 < 坚果Pro >
+2.启动appium服务命令：nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 --bootstrap-port 4713 > /dev/null 2>&1 &
+ （ 注：第一次需要在真机上进行授权、可能需要删除 ATX.apk 应用 ）
+
+【 Docker Appium Server 】
+1.adb连真机命令：docker exec -it appium_andriod adb connect 192.168.31.136:5555 < 小米5S >
+2.启动appium容器：docker-compose -f appium_android_compose.yml --compatibility up -d
+
+
+########################################################################################################################
+
+
+
 【 本地 Mac 相关 】
 
 1.uWSGI配置文件：./vassals/mac_app_uwsgi.ini
@@ -139,21 +167,6 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 3.查看 appium server 进程 PID
     ps -ef | grep -v "grep" | grep appium
-
-
-------------------------------------------
-
-
-【 本 地 配 置 Appium Android 环 境 】
-
-【 Mac 】
-1.adb连真机命令：adb connect 192.168.31.253:4444 < 坚果Pro >
-2.启动appium服务命令：nohup node /Applications/Appium.app/Contents/Resources/app/node_modules/appium/build/lib/main.js --port 4723 --bootstrap-port 4713 > /dev/null 2>&1 &
- （ 注：第一次需要在真机上进行授权、可能需要删除 ATX.apk 应用 ）
-
-【 Docker 】
-1.adb连真机命令：docker exec -it appium_andriod adb connect 192.168.31.136:5555 < 小米5S >
-2.启动appium容器
 
 
 ------------------------------------------
@@ -285,7 +298,7 @@ adb -s 15a6c95a shell input keyevent 26
 （2）将./Env/目录下的 env_config_docker.py 重命名为 env_config.py
 
 6.访问地址（ Docker 内部 ）：
-（1）测试报告 -> http://127.0.0.1:80/test_report/<pro_name>/[APP_report]<pro_name>.html
+（1）测试报告 -> http://127.0.0.1:80/test_report/<pro_name>/[Android_report]<pro_name>.html
 （2）接口地址 -> http://127.0.0.1:80/api/
                http://127.0.0.1:80/api/Android/sync_run_case
                http://127.0.0.1:80/api/Android/get_img/5e5cac9188121299450740b3
@@ -300,19 +313,24 @@ adb -s 15a6c95a shell input keyevent 26
     ( 备注：docker 配置 1080 映射 80 )
 
 8.关于部署
-  通过'fabric'工具进行部署 -> deploy.py
-    （1）将本地代码拷贝入临时文件夹，并删除不需要的文件目录
-    （2）将临时文件夹中的该项目压缩打包，上传至服务器的临时文件夹中
-    （3）在服务器中进行部署操作：停止nginx、mongo、uwsgi服务 -> 替换项目、uwsgi.ini配置文件 -> 替换config配置文件 -> 启动nginx、mongo、uwsgi服务
-    （4）删除本地的临时文件夹
-  'gulp'命令 执行 deploy.py 文件 进行部署
-
+    1.通过'fabric'工具进行部署 -> deploy.py
+     （1）将本地代码拷贝入临时文件夹，并删除不需要的文件目录
+     （2）将临时文件夹中的该项目压缩打包，上传至服务器的临时文件夹中
+     （3）在服务器中进行部署操作：停止nginx、mongo、uwsgi服务 -> 替换项目、uwsgi.ini配置文件 -> 替换config配置文件 -> 启动nginx、mongo、uwsgi服务
+     （4）删除本地的临时文件夹
+      命令：gulp "deploy docker" -> 编译后 部署docker服务
+    2.手动启动相关服务
+    （1）启动 Mac 中的 appium 服务、连接设备（坚果pro）
+    （2）启动 Docker 中的 appium 服务
+    （3）连接 Docker 中的 设备（小米5S）
+     （ 相关命令在 gulpfile.js 文件最后 ）
 
 
 ########################################################################################################################
 
+
 【 框 架 工 具 】
- Python3 + Selenium3 + unittest + Flask + uWSGI + Nginx + Bootstrap + MongoDB + Docker + Fabric + Gulp
+ Python3 + appium + unittest + Flask + uWSGI + Nginx + Bootstrap + MongoDB + Docker + Fabric + Gulp
 
 
 【 框 架 结 构 】（ 提高代码的：可读性、重用性、易扩展性 ）
@@ -320,12 +338,11 @@ adb -s 15a6c95a shell input keyevent 26
  2.Build层：     编译后的静态文件
  3.Common层：    通用方法、测试方法
  4.Config层：    错误码映射、全局变量、定时任务、项目配置、测试地址配置
- 5.Data层：      相关测试数据
- 6.Env层：       环境配置
- 7.Project层：   区分不同项目、page_object(页面操作方法、元素定位)、test_case(测试用例)
- 8.TestBase层：  封装了浏览器驱动操作方法、提供'测试用例'父类第基础方法(继承’unittest.TestCase')、测试报告生成、同步执行用例方法
- 9.Tools层：     工具函数
- 10.其他：
+ 5.Env层：       环境配置
+ 6.Project层：   区分不同项目、page_object(页面操作方法、元素定位)、test_case(测试用例)
+ 7.TestBase层：  封装了浏览器驱动操作方法、提供'测试用例'父类第基础方法(继承’unittest.TestCase')、测试报告生成、同步执行用例方法
+ 8.Tools层：     工具函数
+ 9.其他：
  （1）vassals/ -> 服务器的'uWSGI配置'
  （2）vassals_local/、venv/ -> 本地的'uWSGI配置、python3虚拟环境'
  （3）Logs/、Reports/、Screenshot/ -> 临时生产的 日志、报告、截图
@@ -334,7 +351,7 @@ adb -s 15a6c95a shell input keyevent 26
 
 【 功 能 点 】
 
-1.使用 Python3 + Selenium3 + unittest + Bootstrap:
+1.使用 Python3 + appium + unittest + Bootstrap:
 （1）使用'unittest'作为测试用例框架
 （2）通过动态修改和添加'unittest.TestSuite'类中的方法和属性，实现启用多线程同时执行多条测试用例
 （3）通过修改'HTMLTestRunner'文件并结合'unittest'测试框架，优化了测试报告的展示方式，并提供了每个测试用例的截图显示
@@ -357,9 +374,7 @@ adb -s 15a6c95a shell input keyevent 26
 
 5.使用 Docker：
 （1）使用Dockerfile构建centos7镜像：提供项目所需的相关配置环境
-（2）使用'selenium/hub'和'selenium/node-chrome-debug'镜像，搭建'Selenium Grid'分布式测试环境
-     （ 可以在linux中启动无界面浏览器测试，并可以指定浏览器的分辨率和实例个数，可以通过'VNC'连接进行调试）
-（3）使用'docker-compose' 一键管理多个容器
+（2）使用'docker-compose' 一键管理多个容器
 
 6.使用 MongoDB ：
 （1）使用'GridFS'进行图片文件的保存与读取

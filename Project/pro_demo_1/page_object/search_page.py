@@ -70,6 +70,16 @@ class SearchPage(Base):
         self.close_btn().click()
         time.sleep(2)
 
+    def smartisan_pro_step(self):
+        """
+        坚果pro 需要执行的步骤
+        :return:
+        """
+        # 点击相关'X'按钮
+        self.screenshot(image_name="close_btn.png")
+        self.close_btn().click()
+        time.sleep(2)
+
     def search_hszz(self, content):
         """
         搜索功能(皇室战争)
@@ -78,6 +88,8 @@ class SearchPage(Base):
 
         if self.device_name == "小米5S":
             self.xiao_mi_5s_step()
+        else:
+            self.smartisan_pro_step()
 
         # 获取搜索文本框1，并点击
         self.screenshot(image_name="hszz_1_search_field.png")
@@ -125,6 +137,8 @@ class SearchPage(Base):
 
         if self.device_name == "小米5S":
             self.xiao_mi_5s_step()
+        else:
+            self.smartisan_pro_step()
 
         # 获取搜索文本框1，并点击
         self.screenshot(image_name="wx_1_search_field.png")
@@ -164,6 +178,8 @@ class SearchPage(Base):
 
         if self.device_name == "小米5S":
             self.xiao_mi_5s_step()
+        else:
+            self.smartisan_pro_step()
 
         # 获取搜索文本框1，并点击
         self.screenshot(image_name="bd_1_search_field.png")

@@ -6,7 +6,7 @@ import time
 
 # 设置变量
 host = "127.0.0.1"
-port = "1022"
+port = "1222"
 user = "centos"
 passwd = "centos"
 pro_name = "pythonAppium_Android"

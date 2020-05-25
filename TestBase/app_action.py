@@ -45,8 +45,8 @@ def get_android_driver(pro_name, current_thread_name_index, connected_android_de
     # desired_caps["uiautomator2ServerLaunchTimeout"] = 30000
 
     # 唤醒屏幕（效果不理想）
-    # desired_caps["unlockType"] = "pattern"
-    # desired_caps["unlockKey"] = "12589"
+    desired_caps["unlockType"] = "pattern"
+    desired_caps["unlockKey"] = "12589"
 
     # 通过'当前线程名索引' 获取已连接设备列表中对应的'Android'设备信息和'Appium'服务
     device_name = None
