@@ -12,11 +12,6 @@
 （4）get_app_info：        通过'项目名称'，获取APP信息（ appPackage、 appActivity ）
 （5）config_android_device_with_appium_server_list：    配置 Android 设备信息 以及 对应的 Appium 服务
 
-    < 备 注 >
-      1.一个Appium服务只能启动一个Android设备，若要使用多线程，则必须要将Android设备与Appium服务绑定起来
-      2.<小米5S>已刷机，可以通过无线连接设备，所以使用docker中的appium服务
-      3.<坚果Pro>未刷机，需要连接一次USB，所以使用mac中的appium服务
-
 
 【 未 解 决 的 问 题 】
 1.真机在灭屏后长时间不运行的情况下，执行测试会因为无法点亮屏幕而导致报错："启动Appium服务的其他异常情况"
@@ -112,6 +107,13 @@ sudo nginx -s reload
 【 Docker Appium Server 】
 1.adb连真机命令：docker exec -it appium_andriod adb connect 192.168.31.136:5555 < 小米5S >
 2.启动appium容器：docker-compose -f appium_android_compose.yml --compatibility up -d
+
+
+【 Appium 多 线 程 并 发 处 理 方 式 】
+通过启动不同Appium服务，每个Appium服务处理不同Android设备的方式 进行多线程并发操作
+< 备 注 >
+虽然 启动Appium服务时，可以指定不同的 --bootstrap-port 端口，但是每个Appium服务连接设备时 adb 命令使用默认的 -P 5037 端口
+导致 无法在同一台服务器上启动多个Appium服务来实现多线程并发，因为他们使用的 adb -P 5037 端口 会相互冲突
 
 
 ########################################################################################################################
