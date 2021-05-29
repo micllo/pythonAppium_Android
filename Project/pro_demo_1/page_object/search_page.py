@@ -18,7 +18,7 @@ class SearchPage(Base):
     def allowed_btn(self):
         return self.find_ele(By.ID, "android:id/button1")
 
-    # 相关'X'按钮
+    # 相关'X'按钮 com.tencent.android.qqdownloader:id/b3f
     def close_btn(self):
         return self.find_ele(By.ID, "com.tencent.android.qqdownloader:id/b3f")
 

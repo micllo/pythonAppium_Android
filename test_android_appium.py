@@ -65,10 +65,10 @@ desired_caps = {
     # 'unlockKey': "12589"
 }
 
-driver = webdriver.Remote('192.168.31.10:4723/wd/hub', desired_caps)
+driver = webdriver.Remote('192.168.31.9:4723/wd/hub', desired_caps)
 
 driver.implicitly_wait(3)
-driver.set_page_load_timeout()
+# driver.set_page_load_timeout()
 
 # 点击'我知道了'按钮
 driver.tap([(250, 1300)])  # 触摸点击

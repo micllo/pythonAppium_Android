@@ -24,3 +24,4 @@ tmp_uwsgi_pid.txt
 Build
 *.png
 *.jpg
+*.scannerwork

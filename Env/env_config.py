@@ -18,8 +18,8 @@ NGINX_API_PROXY = "api_local"
 # 测试报告路径
 REPORT_PATH = "/test_report_local/"
 
-# Mongo 端口
-MONGO_PORT = "27017"
+# Mongo 地址
+MONGODB_ADDR = SERVER_IP + ":27017"
 
 
 ############################################# 相 同 的 配 置 #############################################
@@ -36,7 +36,6 @@ APPIUM_SERVER_MAC_4723 = SERVER_IP + ":4723/wd/hub"
 APPIUM_SERVER_DOCKER_4724 = SERVER_IP + ":4724/wd/hub"
 
 # mongo 数据库
-MONGODB_ADDR = SERVER_IP + ":" + MONGO_PORT
 MONGODB_DATABASE = "app_auto_test_appium_android"
 
 # 构建的时候使用前端静态文件路径 ( Api/__init__.py文件的同级目录 ) 'static'、'templates'

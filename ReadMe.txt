@@ -266,6 +266,7 @@ adb -s 15a6c95a shell input keyevent 26
 
     Appium服务(Docker)中提供的'noVNC'界面地址来查看'appium log'
     http://docker_ip:6080
+    http://localhost:6080
 
 ------------------------------------------
 
@@ -307,11 +308,11 @@ adb -s 15a6c95a shell input keyevent 26
     ( 备注：uwgsi 启动 8081 端口、nginx 配置 80 反向代理 8081 )
 
 7.访问地址（ 外部访问 ）：
-（1）用例页面 -> http://192.168.31.10:1080/api/Android/index
-（2）测试报告 -> http://192.168.31.10:1080/test_report/<pro_name>/[Android_report]<pro_name>.html
-（3）接口地址 -> http://192.168.31.10:1080/api/
-               http://192.168.31.10:1080/api/Android/sync_run_case
-               http://192.168.31.10:1080/api/Android/get_img/5e5cac9188121299450740b3
+（1）用例页面 -> http://192.168.31.9:1080/api/Android/index
+（2）测试报告 -> http://192.168.31.9:1080/test_report/<pro_name>/[Android_report]<pro_name>.html
+（3）接口地址 -> http://192.168.31.9:1080/api/
+               http://192.168.31.9:1080/api/Android/sync_run_case
+               http://192.168.31.9:1080/api/Android/get_img/5e5cac9188121299450740b3
     ( 备注：docker 配置 1080 映射 80 )
 
 8.关于部署
