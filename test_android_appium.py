@@ -50,6 +50,7 @@ def swipRight(driver, t=1000):
 desired_caps = {
     'platformName': 'Android',
     # 小米 5S
+    # 'platformVersion': '5.1.1',
     'platformVersion': '7.0',
     'deviceName': '192.168.31.136:5555',
 
@@ -59,8 +60,22 @@ desired_caps = {
 
     # 应用宝 app
     'appPackage': 'com.tencent.android.qqdownloader',
-    'appActivity': 'com.tencent.pangu.link.SplashActivity'
-    # 唤醒屏幕
+    'appActivity': 'com.tencent.pangu.link.SplashActivity',
+
+    # 计算器（手机自带）
+    # 'appPackage': 'com.youba.calculate',
+    # 'appActivity': '.MainActivity',
+
+    # 在当前'session'下不会重置应用的状态，默认 false
+    # false：表示 模拟首次启动，清除缓存
+    'noReset': False,
+
+    # 是否开启中文键盘（非必填）
+    'unicodeKeyboard': True,
+    # 每次开启应用之前重置键盘的状态（非必填）
+    'resetKeyboard': True
+
+    # 唤醒屏幕（非必填）
     # 'unlockType': "pattern"
     # 'unlockKey': "12589"
 }

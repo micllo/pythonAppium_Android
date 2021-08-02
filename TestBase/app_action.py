@@ -40,6 +40,14 @@ def get_android_driver(pro_name, current_thread_name_index, connected_android_de
     # Android 在启动后等待设备就绪的超时时长，以秒为单位
     desired_caps["androidDeviceReadyTimeout"] = 30
 
+    # 在当前'session'下不会重置应用的状态（非必填）
+    # 默认false：表示 模拟首次启动，清除缓存
+    desired_caps["noReset"] = False
+    # 是否开启中文键盘（非必填）
+    desired_caps["unicodeKeyboard"] = True
+    # 每次开启应用之前重置键盘的状态（非必填）
+    desired_caps["resetKeyboard"] = True
+
     # appium 启动时进程保存的原因（有待验证）
     # desired_caps["adbExecTimeout"] = 20000
     # desired_caps["uiautomator2ServerLaunchTimeout"] = 30000
